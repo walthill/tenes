@@ -35,6 +35,7 @@ private:
 	PhaseSubSection m_currentSubPhase;
 
 	void UpdateMatchPhase();
+	void RenderMatchPhase();
 
 };
 

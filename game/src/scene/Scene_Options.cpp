@@ -19,6 +19,7 @@ void Scene_Options::Draw()
 void Scene_Options::Unload()
 {
 	// TODO: Unload OPTIONS screen variables here!
+	Scene::Unload();
 }
 
 void Scene_Options::TryFinish()

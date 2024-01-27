@@ -12,6 +12,8 @@ class Scene_Game : public Scene
 		void Unload()		override;
 		void TryFinish()	override;
 
+		virtual std::string GetName() override { return "Game"; }
+
 	private:
 };
 

@@ -20,6 +20,7 @@ void Scene_Credits::Draw()
 void Scene_Credits::Unload()
 {
 	// TODO: Unload CREDITS screen variables here!
+	Scene::Unload();
 }
 
 void Scene_Credits::TryFinish()

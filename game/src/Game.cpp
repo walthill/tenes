@@ -26,7 +26,8 @@ void Game::Update()
 
 void Game::Render()
 {
-	gameGrid.Render();
+    RenderMatchPhase();
+    gameGrid.Render();
 }
 
 void Game::SetNextPhase(MatchPhase* a_phase)
@@ -78,4 +79,10 @@ void Game::UpdateMatchPhase()
         default:
             break;
     }
+}
+
+void Game::RenderMatchPhase()
+{
+    if(mp_currentPhase != nullptr)
+        mp_currentPhase->Render();
 }

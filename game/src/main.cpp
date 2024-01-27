@@ -21,12 +21,12 @@ void InitGame()
 	Game::LoadGame(windowX, windowY, tileSize, gameGrid);
 }
 
-void update()
+void Update()
 {
 	SceneManager::UpdateScene();
 }
 
-void render()
+void Render()
 {
 	// drawing
 	BeginDrawing();
@@ -36,7 +36,7 @@ void render()
 	EndDrawing();
 }
 
-void initRaylib()
+void InitRaylib()
 {
 	// set up the window
 #if DEBUG
@@ -49,7 +49,7 @@ void initRaylib()
 	InitAudioDevice();
 }
 
-void cleanRaylib()
+void CleanRaylib()
 {
 	// cleanup
 	CloseAudioDevice();
@@ -58,7 +58,7 @@ void cleanRaylib()
 
 int main()
 {
-	initRaylib();
+	InitRaylib();
 
 #ifdef NDEBUG
 	SceneManager::SetScene(LOGO);
@@ -71,11 +71,11 @@ int main()
 	// game loop
 	while (!WindowShouldClose())
 	{
-		update();
-		render();
+		Update();
+		Render();
 	}
 
 	SceneManager::Cleanup();
-	cleanRaylib();
+	CleanRaylib();
 	return 0;
 }

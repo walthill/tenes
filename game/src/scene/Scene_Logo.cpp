@@ -112,6 +112,7 @@ void Scene_Logo::Draw()
 
 void Scene_Logo::Unload()
 {
+    Scene::Unload();
 }
 
 void Scene_Logo::TryFinish()

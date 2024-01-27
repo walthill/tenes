@@ -29,6 +29,7 @@ void Scene_Title::Draw()
 
 void Scene_Title::Unload()
 {
+    Scene::Unload();
 }
 
 void Scene_Title::TryFinish()

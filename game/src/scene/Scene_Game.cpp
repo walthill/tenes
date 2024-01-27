@@ -26,6 +26,7 @@ void Scene_Game::Draw()
 void Scene_Game::Unload()
 {
 	// TODO: Unload GAMEPLAY screen variables here!
+	Scene::Unload();
 }
 
 void Scene_Game::TryFinish()

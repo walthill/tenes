@@ -20,6 +20,7 @@ void Scene_Ending::Draw()
 void Scene_Ending::Unload()
 {
 	// TODO: Unload ENDING screen variables here!
+	Scene::Unload();
 }
 
 void Scene_Ending::TryFinish()
