@@ -18,7 +18,7 @@
 
 */
 
-enum class TileType { NIL = -1, BASE = 0, };
+enum class TileType { NIL = -1, BASE = 0, PLAYER, ENEMY };
 
 struct Tile
 {
@@ -45,8 +45,11 @@ class Grid
 		int GetTileIndexFromPos(Vector2 a_pos);
 		Tile* GetTileFromPos(float a_x, float a_y);
 		Tile* GetTileFromPos(Vector2 a_pos);
-		int GetWidth() { return m_width; };
-		int GetHeight() { return m_height; };
+		inline int GetWidth() { return m_width; };
+		inline int GetHeight() { return m_height; };
+		inline Piece* GetPlayerPiece() { return &m_playerPiece; }
+
+		void MovePlayer(bool a_forward, int a_moveDistance);
 
 	private:
 		bool m_renderDebug = false;

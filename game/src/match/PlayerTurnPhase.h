@@ -3,6 +3,8 @@
 
 #include "MatchPhase.h"
 
+class Piece;
+
 class PlayerTurnPhase : public MatchPhase
 {
 	public:
@@ -12,7 +14,6 @@ class PlayerTurnPhase : public MatchPhase
         virtual void Start() override;
         virtual void Update() override;
         virtual bool Uninitialize() override;
-
 };
 
 #endif // !PLAYER_TURN_PHASE_H
