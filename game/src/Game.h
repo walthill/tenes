@@ -3,8 +3,11 @@
 
 #include "grid\Grid.h"
 #include "scene\SceneManager.h"
+#include "match\MatchPhaseDefines.h"
 
 #define GM Game::gameInstance
+
+enum class PhaseSubSection { None = 0, InitializePhase, Start, Update, UninitializePhase };
 
 class Game
 {
@@ -15,11 +18,24 @@ public:
 	void Update();
 	void Render();
 
+	void SetNextPhase(MatchPhase* a_phase);
+	void SetCurrentPhase(MatchPhase* a_phase);
+
 	//Game Defines
 	int windowX;
 	int windowY;
 	int tileSize;
 	Grid gameGrid;
+
+private:
+
+	bool m_changePhase;
+	MatchPhase* mp_currentPhase;
+	MatchPhase* mp_nextPhase;
+	PhaseSubSection m_currentSubPhase;
+
+	void UpdateMatchPhase();
+
 };
 
 #endif

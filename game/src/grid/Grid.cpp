@@ -1,3 +1,4 @@
+#include "raylib.h"
 #include "Grid.h"
 
 Grid::Grid() :
@@ -23,6 +24,9 @@ Grid::Grid(float a_PosX, float a_PosY, int a_numRows, int a_numCols, int a_tileS
 			m_gridList.push_back(tile);
 		}
 	}
+
+	m_playerPiece = Piece(5, true);
+	m_enemyPiece = Piece(5, false);
 }
 
 void Grid::Update()
@@ -46,6 +50,26 @@ void Grid::Render()
 		}
 	}
 #endif
+
+	//RenderTiles();
+}
+
+void Grid::RenderTiles()
+{
+	auto count = m_gridList.size();
+	for (size_t i = 0; i < count; i++)
+	{
+		auto tile = m_gridList[i];
+		
+		switch (tile.type)
+		{
+			case TileType::NIL:			break;
+			case TileType::BASE:		break;//DrawTexture	
+			//case TileType::PLAYER:		//DrawTexture	break;
+			//case TileType::ENEMY:		//DrawTexture	break;
+			//case TileType::POWERED_TYPE_X:		//DrawTexture	break;
+		}
+	}
 }
 
 Vector2 Grid::Get2DCoordsFromPos(Vector2 a_pos)

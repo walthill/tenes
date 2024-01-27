@@ -7,6 +7,7 @@ For a C++ project simply rename the file to .cpp and run premake
 
 */
 
+#include "raylib.h"
 #include "Game.h"
 
 const int windowX = 960;
@@ -62,7 +63,7 @@ int main()
 #ifdef NDEBUG
 	SceneManager::SetScene(LOGO);
 #elif DEBUG 
-	SceneManager::SetScene(GAMEPLAY);
+	SceneManager::SetScene(TITLE);
 #endif // !NDEBUG
 
 	InitGame();
