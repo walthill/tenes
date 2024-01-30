@@ -21,6 +21,8 @@ public:
 	void SetNextPhase(MatchPhase* a_phase);
 	void SetCurrentPhase(MatchPhase* a_phase);
 
+	void LoadScene(GameScreen a_screen);
+
 	//Game Defines
 	int windowX;
 	int windowY;

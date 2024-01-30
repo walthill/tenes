@@ -14,7 +14,7 @@ class Scene
 		virtual void Unload();
 		virtual void TryFinish()	=0;
 
-		virtual std::string GetName() { return "Scene"; }
+		const inline virtual std::string GetName() { return "Scene"; }
 
 		static int s_framesCounter;
 		static int s_finishScreen;

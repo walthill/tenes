@@ -1,14 +1,15 @@
 #include "raylib.h"
 #include "PlayerTurnPhase.h"
 #include "Game.h"
-#include <grid/Piece.h>
 
 PlayerTurnPhase::PlayerTurnPhase()
 {
-	m_waitAfterRollTime = 2.0f;
+	m_waitAfterRollTime = 1.0f;
+	m_timeToEndTurn = 2.0f;
 	m_timer = 0;
 	m_rollComplete = false;
 	m_rollAmount = 0;
+	m_turnEnd = false;
 }
 
 bool PlayerTurnPhase::Initialize()
@@ -23,9 +24,26 @@ void PlayerTurnPhase::Start()
 
 void PlayerTurnPhase::Update()
 {
+	if (m_turnEnd)
+	{
+		if (m_timer < m_timeToEndTurn)
+			m_timer += GetFrameTime();
+		else
+		{
+			m_timer = 0;
+			if (!GM->gameGrid.HasPlayerWon())
+				GM->SetNextPhase(new EnemyTurnPhase());
+			else 
+			{
+				//TODO: win condition
+				GM->LoadScene(ENDING);
+			}
+		}
+		return;
+	}
+
 	if (!m_rollComplete)
 	{
-		DrawText("ROLL", 400, 100, 36, BLACK);
 		if (IsKeyPressed(KEY_SPACE))
 		{
 			m_rollAmount = GetRandomValue(0, 2);
@@ -46,20 +64,27 @@ void PlayerTurnPhase::Update()
 				{
 					auto amountStr = "Player Move -- Forward: " + std::to_string(m_rollAmount);
 					TraceLog(LOG_TRACE, amountStr.c_str());
-					GM->gameGrid.MovePlayer(true, m_rollAmount);
-					//TODO: Start enemy phase
+					if (GM->gameGrid.MovePlayer(true, m_rollAmount))
+					{
+						m_turnEnd = true;
+						m_timer = 0.0f;
+					}
 				}
 				else if (IsKeyPressed(KEY_Q))
 				{
 					auto amountStr = "Player Move -- Back: " + std::to_string(m_rollAmount);
 					TraceLog(LOG_TRACE, amountStr.c_str());
-					GM->gameGrid.MovePlayer(false, m_rollAmount);
-					//TODO: Start enemy phase
+					if (GM->gameGrid.MovePlayer(false, m_rollAmount))
+					{
+						m_turnEnd = true;
+						m_timer = 0.0f;
+					}
 				}
 			}
 			else
 			{
-				//TODO: Start enemy phase
+				m_turnEnd = true;
+				m_timer = 0.0f;
 			}
 		}
 	}

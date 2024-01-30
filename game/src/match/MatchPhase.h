@@ -14,7 +14,7 @@ class MatchPhase
         virtual void Render();
         virtual bool Uninitialize();
 
-        inline virtual std::string GetName() { return "MatchPhase"; }
+        const inline virtual std::string GetName() { return "MatchPhase"; }
 
 	private:
 };

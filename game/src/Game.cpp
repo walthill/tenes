@@ -45,6 +45,11 @@ void Game::SetCurrentPhase(MatchPhase* a_phase)
 	m_currentSubPhase = PhaseSubSection::InitializePhase;
 }
 
+void Game::LoadScene(GameScreen a_screen)
+{
+    SceneManager::SetScene(a_screen);
+}
+
 void Game::UpdateMatchPhase()
 {
     bool complete = false;
@@ -83,6 +88,14 @@ void Game::UpdateMatchPhase()
 
 void Game::RenderMatchPhase()
 {
-    if(mp_currentPhase != nullptr)
-        mp_currentPhase->Render();
+    switch (m_currentSubPhase)
+    {
+        case PhaseSubSection::InitializePhase:
+        case PhaseSubSection::Start:
+        case PhaseSubSection::Update:
+            mp_currentPhase->Render();
+            break;
+        default:
+            break;
+    }
 }

@@ -1,12 +1,12 @@
-#ifndef PLAYER_TURN_PHASE_H
-#define PLAYER_TURN_PHASE_H
+#ifndef ENEMY_TURN_PHASE_H
+#define ENEMY_TURN_PHASE_H
 
 #include "MatchPhase.h"
 
-class PlayerTurnPhase : public MatchPhase
+class EnemyTurnPhase : public MatchPhase
 {
-	public:
-        PlayerTurnPhase();
+    public:
+        EnemyTurnPhase();
 
         virtual bool Initialize() override;
         virtual void Start() override;
@@ -14,9 +14,10 @@ class PlayerTurnPhase : public MatchPhase
         virtual void Render() override;
         virtual bool Uninitialize() override;
 
-        const inline virtual std::string GetName() override { return "PlayerTurnPhase"; }
+        const inline virtual std::string GetName() override { return "EnemyTurnPhase"; }
 
     private:
+        float m_timeUntilRoll;
         float m_waitAfterRollTime;
         float m_timer;
         bool m_rollComplete;
@@ -25,4 +26,4 @@ class PlayerTurnPhase : public MatchPhase
         float m_timeToEndTurn;
 };
 
-#endif // !PLAYER_TURN_PHASE_H
+#endif // !ENEMY_TURN_PHASE_H

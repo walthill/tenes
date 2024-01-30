@@ -12,7 +12,7 @@ class Scene_Options : public Scene
 		void Unload()		override;
 		void TryFinish()	override;
 
-		virtual std::string GetName() override { return "Options"; }
+		const inline virtual std::string GetName() override { return "Options"; }
 
 	private:
 

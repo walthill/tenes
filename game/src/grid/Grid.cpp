@@ -70,7 +70,7 @@ void Grid::RenderTiles()
 			case TileType::NIL:			tileColor = MAGENTA;	break;
 			case TileType::BASE:		tileColor = GRAY;		break;
 			case TileType::PLAYER:		tileColor = GOLD;		break;
-			//case TileType::ENEMY:		tileColor = MAROON;		break;
+			case TileType::ENEMY:		tileColor = MAROON;		break;
 		}
 
 		DrawRectangle((int)tile.pos.x, (int)tile.pos.y, m_tileSize, m_tileSize, tileColor);
@@ -116,10 +116,10 @@ Tile* Grid::GetTileFromPos(Vector2 a_pos)
 	return GetTileFromPos(a_pos.x, a_pos.y);
 }
 
-void Grid::MovePlayer(bool a_forward, int a_moveDistance)
+bool Grid::MovePlayer(bool a_forward, int a_moveDistance)
 {
 	if (a_moveDistance == 0)
-		return;
+		return false;
 
 	auto initialIndex = m_playerPiece.GetBoardIndex();
 	if (a_forward)
@@ -127,9 +127,12 @@ void Grid::MovePlayer(bool a_forward, int a_moveDistance)
 		auto moveIndex = initialIndex + a_moveDistance;
 		if (moveIndex < m_gridList.size())
 		{
+			//TODO: unique grid tile interactions
+
+			CheckPieceSwapEnemy(initialIndex, moveIndex);
+
 			m_gridList[moveIndex].type = TileType::PLAYER;
 			m_playerPiece.SetBoardIndex(moveIndex);
-			m_gridList[initialIndex].type = TileType::BASE;
 		}
 	}
 	else
@@ -137,9 +140,84 @@ void Grid::MovePlayer(bool a_forward, int a_moveDistance)
 		auto moveIndex = initialIndex - a_moveDistance;
 		if (moveIndex >= 0)
 		{
+			CheckPieceSwapEnemy(initialIndex, moveIndex);
+
 			m_gridList[moveIndex].type = TileType::PLAYER;
 			m_playerPiece.SetBoardIndex(moveIndex);
-			m_gridList[initialIndex].type = TileType::BASE;
 		}
+	}
+
+	return true;
+}
+
+bool Grid::MoveEnemy(bool a_forward, int a_moveDistance)
+{
+	if (a_moveDistance == 0)
+		return false;
+
+	auto initialIndex = m_enemyPiece.GetBoardIndex();
+	if (a_forward)
+	{
+		auto moveIndex = initialIndex + a_moveDistance;
+		if (moveIndex < m_gridList.size())
+		{
+			//TODO: unique grid tile interactions
+
+			CheckPieceSwapPlayer(initialIndex, moveIndex);
+
+			m_gridList[moveIndex].type = TileType::ENEMY;
+			m_enemyPiece.SetBoardIndex(moveIndex);
+		}
+	}
+	else
+	{
+		auto moveIndex = initialIndex - a_moveDistance;
+		if (moveIndex >= 0)
+		{
+			CheckPieceSwapPlayer(initialIndex, moveIndex);
+
+			m_gridList[moveIndex].type = TileType::ENEMY;
+			m_enemyPiece.SetBoardIndex(moveIndex);
+		}
+	}
+
+	return true;
+}
+
+bool Grid::HasEnemyWon()
+{
+	return m_enemyPiece.GetBoardIndex() == m_gridList.size() - 1;
+}
+
+bool Grid::HasPlayerWon()
+{
+	return m_playerPiece.GetBoardIndex() == m_gridList.size() - 1;
+}
+
+void Grid::CheckPieceSwapEnemy(int a_initialIndex, int a_destinationIndex)
+{
+	if (m_gridList[a_destinationIndex].type == TileType::ENEMY)
+	{
+		//move enemy to player's start position
+		m_enemyPiece.SetBoardIndex(a_initialIndex);
+		m_gridList[a_initialIndex].type = TileType::ENEMY;
+	}
+	else
+	{
+		m_gridList[a_initialIndex].type = TileType::BASE;
+	}
+}
+
+void Grid::CheckPieceSwapPlayer(int a_initialIndex, int a_destinationIndex)
+{
+	if (m_gridList[a_destinationIndex].type == TileType::PLAYER)
+	{
+		//move player to enemy's start position
+		m_playerPiece.SetBoardIndex(a_initialIndex);
+		m_gridList[a_initialIndex].type = TileType::PLAYER;
+	}
+	else
+	{
+		m_gridList[a_initialIndex].type = TileType::BASE;
 	}
 }

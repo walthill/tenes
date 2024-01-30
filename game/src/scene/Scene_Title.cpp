@@ -24,7 +24,7 @@ void Scene_Title::Draw()
     // TODO: Draw TITLE screen here!
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
     DrawText("TITLE SCREEN", 20, 10, 20, DARKGREEN);
-    DrawText("Tense - PRESS ENTER TO PLAY", 120, 220, 20, WHITE);
+    DrawText("Tenes - PRESS ENTER TO PLAY", 120, 220, 20, WHITE);
 }
 
 void Scene_Title::Unload()

@@ -20,6 +20,11 @@ float SceneManager::s_transAlpha = 0.0f;
 void SceneManager::SetScene(GameScreen a_screen)
 {
     s_currentScreenType = a_screen;
+
+    Scene* oldScene = nullptr;
+    if (sp_currentScene != nullptr)
+        oldScene = sp_currentScene;
+
     switch (s_currentScreenType)
     {
         case LOGO:      sp_currentScene = new Scene_Logo();     break;
@@ -33,6 +38,12 @@ void SceneManager::SetScene(GameScreen a_screen)
 
     if (sp_currentScene != nullptr)
         sp_currentScene->Init();
+
+    if (oldScene != nullptr)
+    {
+        delete oldScene;
+        oldScene = nullptr;
+    }
 }
 
 void SceneManager::UpdateScene()

@@ -12,7 +12,7 @@ class Scene_Logo : public Scene
 		void Unload()		override;
 		void TryFinish()	override;
 
-		virtual std::string GetName() { return "Logo"; }
+		const inline virtual std::string GetName() { return "Logo"; }
 
 	private:
 		int m_lettersCount;

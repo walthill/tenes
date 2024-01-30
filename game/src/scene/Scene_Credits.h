@@ -12,7 +12,7 @@ class Scene_Credits : public Scene
 		void Unload()		override;
 		void TryFinish()	override;
 
-		virtual std::string GetName() override { return "Credits"; }
+		const inline virtual std::string GetName() override { return "Credits"; }
 
 	private:
 

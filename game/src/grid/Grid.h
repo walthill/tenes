@@ -49,7 +49,10 @@ class Grid
 		inline int GetHeight() { return m_height; };
 		inline Piece* GetPlayerPiece() { return &m_playerPiece; }
 
-		void MovePlayer(bool a_forward, int a_moveDistance);
+		bool MovePlayer(bool a_forward, int a_moveDistance);
+		bool MoveEnemy(bool a_forward, int a_moveDistance);
+		bool HasEnemyWon();
+		bool HasPlayerWon();
 
 	private:
 		bool m_renderDebug = false;
@@ -59,6 +62,9 @@ class Grid
 		int m_height;
 		Piece m_playerPiece;
 		Piece m_enemyPiece;
+
+		void CheckPieceSwapPlayer(int a_initialIndex, int a_destinationIndex);
+		void CheckPieceSwapEnemy(int a_initialIndex, int a_destinationIndex);
 };
 
 #endif // !GRID_H
