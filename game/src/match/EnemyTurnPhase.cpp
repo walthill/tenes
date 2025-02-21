@@ -50,10 +50,16 @@ void EnemyTurnPhase::Update()
 		else
 		{
 			m_timer = 0;
-			m_rollAmount = GetRandomValue(0, 2);
+			m_rollAmount = GetRandomValue(m_minRollAmount, m_maxRollAmount);
 			auto amountStr = "Enemy Move -- Roll Amount: " + std::to_string(m_rollAmount);
 			TraceLog(LOG_TRACE, amountStr.c_str());
 			m_rollComplete = true;
+			if (m_nextRollBonus)
+			{
+				m_nextRollBonus = false;
+				m_minRollAmount = c_defaultMinRollAmount;
+				m_maxRollAmount = c_defaultMaxRollAmount;
+			}
 		}
 	}
 	else
@@ -71,6 +77,7 @@ void EnemyTurnPhase::Update()
 				auto amountStr = "Enemy Move -- Forward: " + std::to_string(m_rollAmount);
 				TraceLog(LOG_TRACE, amountStr.c_str());
 				GM->gameGrid.MoveEnemy(true, m_rollAmount);
+				CheckForBonusTile();
 			}
 			m_turnEnd = true;
 		}
@@ -89,4 +96,39 @@ bool EnemyTurnPhase::Uninitialize()
 {
 	MatchPhase::Uninitialize();
 	return true;
+}
+
+void EnemyTurnPhase::CheckForBonusTile()
+{
+	auto piece = GM->gameGrid.GetEnemyPiece();	//TODO: update to support multi-piece
+	auto tile = GM->gameGrid.GetTileFromIndex(piece->GetBoardIndex());
+	switch (tile->type)
+	{
+		case TileType::MOVE_BONUS:		ApplyBonusMove(); break;
+		case TileType::PIECE_BONUS:		ApplyBonusPiece(); break;
+		case TileType::POINTS_BONUS:	ApplyBonusPoints(); break;
+		default: break;
+	}
+}
+
+void EnemyTurnPhase::ApplyBonusMove()
+{
+	m_nextRollBonus = true;
+	m_minRollAmount += 1;
+	m_maxRollAmount += 2;
+}
+
+void EnemyTurnPhase::ApplyBonusPiece()
+{
+	//TODO: add a piece to the board
+}
+
+void EnemyTurnPhase::ApplyBonusPoints()
+{
+	m_scoreBonusHitCount += 1;
+	if (m_scoreBonusHitCount == GM->gameGrid.GetBonusPointsTileTargetHitCount())
+	{
+		GM->gameGrid.BonusPointsAwarded();
+		//TODO: addd bonus points, who keeps track of the points
+	}
 }

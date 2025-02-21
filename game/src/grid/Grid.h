@@ -18,7 +18,7 @@
 
 */
 
-enum class TileType { NIL = -1, BASE = 0, PLAYER, ENEMY };
+enum class TileType { NIL = -1, BASE = 0, MOVE_BONUS, PIECE_BONUS, POINTS_BONUS };
 
 struct Tile
 {
@@ -32,39 +32,49 @@ struct Tile
 
 class Grid
 {
-	public:
-		Grid();
-		Grid(float a_PosX, float a_PosY, int a_numRows, int a_numCols, int a_tileSize);
-		
-		void Update();
-		void Render();
+public:
+	Grid();
+	Grid(float a_PosX, float a_PosY, int a_numRows, int a_numCols, int a_tileSize);
 
-		void RenderTiles();
-		Vector2 Get2DCoordsFromPos(Vector2 a_pos);
-		int GetTileIndexFromPos(float a_x, float a_y);
-		int GetTileIndexFromPos(Vector2 a_pos);
-		Tile* GetTileFromPos(float a_x, float a_y);
-		Tile* GetTileFromPos(Vector2 a_pos);
-		inline int GetWidth() { return m_width; };
-		inline int GetHeight() { return m_height; };
-		inline Piece* GetPlayerPiece() { return &m_playerPiece; }
+	void InitBonusTiles();
 
-		bool MovePlayer(bool a_forward, int a_moveDistance);
-		bool MoveEnemy(bool a_forward, int a_moveDistance);
-		bool HasEnemyWon();
-		bool HasPlayerWon();
+	void Update();
+	void Render();
 
-	private:
-		bool m_renderDebug = false;
-		std::vector<Tile> m_gridList;
-		int m_tileSize;
-		int m_width;
-		int m_height;
-		Piece m_playerPiece;
-		Piece m_enemyPiece;
+	void RenderTiles();
+	Vector2 Get2DCoordsFromPos(Vector2 a_pos);
+	int GetTileIndexFromPos(float a_x, float a_y);
+	int GetTileIndexFromPos(Vector2 a_pos);
+	Tile* GetTileFromPos(float a_x, float a_y);
+	Tile* GetTileFromPos(Vector2 a_pos);
+	Tile* GetTileFromIndex(int a_index);
+	inline int GetWidth() { return m_width; };
+	inline int GetHeight() { return m_height; };
+	inline Piece* GetPlayerPiece() { return &m_playerPiece; }
+	inline Piece* GetEnemyPiece() { return &m_playerPiece; }
 
-		void CheckPieceSwapPlayer(int a_initialIndex, int a_destinationIndex);
-		void CheckPieceSwapEnemy(int a_initialIndex, int a_destinationIndex);
+	bool MovePlayer(bool a_forward, int a_moveDistance);
+	bool MoveEnemy(bool a_forward, int a_moveDistance);
+	bool HasEnemyWon();
+	bool HasPlayerWon();
+
+	int GetBonusPointsTileTargetHitCount() { return m_bonusPointsTileTargetHitCount; }
+	void BonusPointsAwarded();
+
+
+private:
+	bool m_renderDebug = false;
+	std::vector<Tile> m_gridList;
+	int m_tileSize;
+	int m_width;
+	int m_height;
+	Piece m_playerPiece;
+	Piece m_enemyPiece;
+	bool m_bonusPointTileAwarded = false;
+	int m_bonusPointsTileTargetHitCount = 3;
+
+	void CheckPieceSwapPlayer(int a_initialIndex, int a_destinationIndex);
+	void CheckPieceSwapEnemy(int a_initialIndex, int a_destinationIndex);
 };
 
 #endif // !GRID_H

@@ -17,6 +17,9 @@ class EnemyTurnPhase : public MatchPhase
         const inline virtual std::string GetName() override { return "EnemyTurnPhase"; }
 
     private:
+        const int c_defaultMinRollAmount = 0;
+        const int c_defaultMaxRollAmount = 2;
+
         float m_timeUntilRoll;
         float m_waitAfterRollTime;
         float m_timer;
@@ -24,6 +27,15 @@ class EnemyTurnPhase : public MatchPhase
         int m_rollAmount;
         bool m_turnEnd;
         float m_timeToEndTurn;
+        int m_minRollAmount = c_defaultMinRollAmount;
+		int m_maxRollAmount = c_defaultMaxRollAmount;
+        bool m_nextRollBonus = false;
+        int m_scoreBonusHitCount = 0;
+
+        void CheckForBonusTile();
+        void ApplyBonusMove();
+        void ApplyBonusPiece();
+        void ApplyBonusPoints();
 };
 
 #endif // !ENEMY_TURN_PHASE_H

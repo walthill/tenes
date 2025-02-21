@@ -1,9 +1,10 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "grid\Grid.h"
 #include "scene\SceneManager.h"
 #include "match\MatchPhaseDefines.h"
+#include "ui\MatchUI.h"
+#include "grid\Grid.h"
 
 #define GM Game::gameInstance
 
@@ -35,9 +36,11 @@ private:
 	MatchPhase* mp_currentPhase;
 	MatchPhase* mp_nextPhase;
 	PhaseSubSection m_currentSubPhase;
+	MatchUI m_matchUI;
 
 	void UpdateMatchPhase();
 	void RenderMatchPhase();
+	void RenderUI();
 
 };
 

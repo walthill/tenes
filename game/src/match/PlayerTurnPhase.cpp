@@ -66,6 +66,7 @@ void PlayerTurnPhase::Update()
 					TraceLog(LOG_TRACE, amountStr.c_str());
 					if (GM->gameGrid.MovePlayer(true, m_rollAmount))
 					{
+						CheckForBonusTile();
 						m_turnEnd = true;
 						m_timer = 0.0f;
 					}
@@ -76,6 +77,7 @@ void PlayerTurnPhase::Update()
 					TraceLog(LOG_TRACE, amountStr.c_str());
 					if (GM->gameGrid.MovePlayer(false, m_rollAmount))
 					{
+						CheckForBonusTile();
 						m_turnEnd = true;
 						m_timer = 0.0f;
 					}
@@ -102,4 +104,39 @@ bool PlayerTurnPhase::Uninitialize()
 {
 	MatchPhase::Uninitialize();
 	return true;
+}
+
+void PlayerTurnPhase::CheckForBonusTile()
+{
+	auto piece = GM->gameGrid.GetPlayerPiece();	//TODO: update to support multi-piece
+	auto tile = GM->gameGrid.GetTileFromIndex(piece->GetBoardIndex());
+	switch (tile->type)
+	{
+	case TileType::MOVE_BONUS:		ApplyBonusMove(); break;
+	case TileType::PIECE_BONUS:		ApplyBonusPiece(); break;
+	case TileType::POINTS_BONUS:	ApplyBonusPoints(); break;
+	default: break;
+	}
+}
+
+void PlayerTurnPhase::ApplyBonusMove()
+{
+	m_nextRollBonus = true;
+	m_minRollAmount += 1;
+	m_maxRollAmount += 2;
+}
+
+void PlayerTurnPhase::ApplyBonusPiece()
+{
+	//TODO: add a piece to the board
+}
+
+void PlayerTurnPhase::ApplyBonusPoints()
+{
+	m_scoreBonusHitCount += 1;
+	if (m_scoreBonusHitCount == GM->gameGrid.GetBonusPointsTileTargetHitCount())
+	{
+		GM->gameGrid.BonusPointsAwarded();
+		//TODO: addd bonus points, who keeps track of the points
+	}
 }

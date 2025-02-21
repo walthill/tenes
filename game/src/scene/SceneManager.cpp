@@ -123,6 +123,11 @@ void SceneManager::Cleanup()
     sp_currentScene = nullptr;
 }
 
+GameScreen SceneManager::GetCurrentSceneType()
+{
+    return s_currentScreenType;
+}
+
 // Request transition to next screen
 void SceneManager::TransitionToScreen(GameScreen screen)
 {

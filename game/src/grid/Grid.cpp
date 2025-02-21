@@ -1,5 +1,7 @@
 #include "raylib.h"
 #include "Grid.h"
+#include <random>
+#include "Game.h"
 
 Grid::Grid() :
 	m_height(0), m_width(0), m_tileSize(0), m_renderDebug(false)
@@ -26,10 +28,28 @@ Grid::Grid(float a_PosX, float a_PosY, int a_numRows, int a_numCols, int a_tileS
 	}
 
 	m_playerPiece = Piece(5, true, 0);
+	
+	//TODO: make pieces objects that are rendered to the screen
+	//m_playerPiece.SetPosition
+
 	m_enemyPiece = Piece(5, false, 1);
 
-	m_gridList[0].type = TileType::PLAYER;
-	m_gridList[1].type = TileType::ENEMY;
+	InitBonusTiles();
+
+}
+
+void Grid::InitBonusTiles() {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis(0, m_width - 1);
+
+	int randomIndex = dis(gen);
+	m_gridList[randomIndex].type = TileType::MOVE_BONUS;
+
+	randomIndex = dis(gen) + m_width;
+	m_gridList[randomIndex].type = TileType::PIECE_BONUS;
+
+	m_gridList[m_gridList.size() - 1].type = TileType::POINTS_BONUS;
 }
 
 void Grid::Update()
@@ -42,6 +62,7 @@ void Grid::Update()
 
 void Grid::Render()
 {
+	RenderTiles();
 #if _DEBUG
 	if (m_renderDebug)
 	{
@@ -53,8 +74,6 @@ void Grid::Render()
 		}
 	}
 #endif
-
-	RenderTiles();
 }
 
 void Grid::RenderTiles()
@@ -67,10 +86,11 @@ void Grid::RenderTiles()
 		auto tileColor = GRAY;
 		switch (tile.type)
 		{
-			case TileType::NIL:			tileColor = MAGENTA;	break;
-			case TileType::BASE:		tileColor = GRAY;		break;
-			case TileType::PLAYER:		tileColor = GOLD;		break;
-			case TileType::ENEMY:		tileColor = MAROON;		break;
+			case TileType::NIL:				tileColor = MAGENTA;	break;
+			case TileType::BASE:			tileColor = GRAY;		break;
+			case TileType::MOVE_BONUS:		tileColor = GREEN;		break;
+			case TileType::PIECE_BONUS:		tileColor = BLUE;		break;
+			case TileType::POINTS_BONUS:	tileColor = BLACK;		break;
 		}
 
 		DrawRectangle((int)tile.pos.x, (int)tile.pos.y, m_tileSize, m_tileSize, tileColor);
@@ -116,6 +136,11 @@ Tile* Grid::GetTileFromPos(Vector2 a_pos)
 	return GetTileFromPos(a_pos.x, a_pos.y);
 }
 
+Tile* Grid::GetTileFromIndex(int a_index)
+{
+	return &m_gridList[a_index];
+}
+
 bool Grid::MovePlayer(bool a_forward, int a_moveDistance)
 {
 	if (a_moveDistance == 0)
@@ -127,11 +152,10 @@ bool Grid::MovePlayer(bool a_forward, int a_moveDistance)
 		auto moveIndex = initialIndex + a_moveDistance;
 		if (moveIndex < m_gridList.size())
 		{
-			//TODO: unique grid tile interactions
-
 			CheckPieceSwapEnemy(initialIndex, moveIndex);
 
-			m_gridList[moveIndex].type = TileType::PLAYER;
+			//TODO: update piece movement
+			//m_gridList[moveIndex].type = TileType::PLAYER;
 			m_playerPiece.SetBoardIndex(moveIndex);
 		}
 	}
@@ -142,7 +166,8 @@ bool Grid::MovePlayer(bool a_forward, int a_moveDistance)
 		{
 			CheckPieceSwapEnemy(initialIndex, moveIndex);
 
-			m_gridList[moveIndex].type = TileType::PLAYER;
+			//TODO: update piece movement
+			//m_gridList[moveIndex].type = TileType::PLAYER;
 			m_playerPiece.SetBoardIndex(moveIndex);
 		}
 	}
@@ -161,11 +186,10 @@ bool Grid::MoveEnemy(bool a_forward, int a_moveDistance)
 		auto moveIndex = initialIndex + a_moveDistance;
 		if (moveIndex < m_gridList.size())
 		{
-			//TODO: unique grid tile interactions
-
 			CheckPieceSwapPlayer(initialIndex, moveIndex);
 
-			m_gridList[moveIndex].type = TileType::ENEMY;
+			//TODO: update piece movement
+			//m_gridList[moveIndex].type = TileType::ENEMY;
 			m_enemyPiece.SetBoardIndex(moveIndex);
 		}
 	}
@@ -176,7 +200,8 @@ bool Grid::MoveEnemy(bool a_forward, int a_moveDistance)
 		{
 			CheckPieceSwapPlayer(initialIndex, moveIndex);
 
-			m_gridList[moveIndex].type = TileType::ENEMY;
+			//TODO: update piece movement
+			//m_gridList[moveIndex].type = TileType::ENEMY;
 			m_enemyPiece.SetBoardIndex(moveIndex);
 		}
 	}
@@ -194,27 +219,38 @@ bool Grid::HasPlayerWon()
 	return m_playerPiece.GetBoardIndex() == m_gridList.size() - 1;
 }
 
+void Grid::BonusPointsAwarded()
+{
+	m_bonusPointTileAwarded = true;
+}
+
 void Grid::CheckPieceSwapEnemy(int a_initialIndex, int a_destinationIndex)
 {
-	if (m_gridList[a_destinationIndex].type == TileType::ENEMY)
+	//TODO: update piece movement
+	if (m_gridList[a_destinationIndex].type == TileType::NIL)
 	{
 		//move enemy to player's start position
 		m_enemyPiece.SetBoardIndex(a_initialIndex);
-		m_gridList[a_initialIndex].type = TileType::ENEMY;
+		//TODO: update piece movement
+		//m_gridList[a_initialIndex].type = TileType::ENEMY;
 	}
 	else
 	{
+		//TODO: update piece movement
 		m_gridList[a_initialIndex].type = TileType::BASE;
 	}
 }
 
+
 void Grid::CheckPieceSwapPlayer(int a_initialIndex, int a_destinationIndex)
 {
-	if (m_gridList[a_destinationIndex].type == TileType::PLAYER)
+	//TODO: update piece movement
+	if (m_gridList[a_destinationIndex].type == TileType::NIL)
 	{
 		//move player to enemy's start position
 		m_playerPiece.SetBoardIndex(a_initialIndex);
-		m_gridList[a_initialIndex].type = TileType::PLAYER;
+		
+		//m_gridList[a_initialIndex].type = TileType::PLAYER;
 	}
 	else
 	{

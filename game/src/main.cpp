@@ -30,9 +30,7 @@ void Render()
 {
 	// drawing
 	BeginDrawing();
-
 	SceneManager::DrawScene();
-
 	EndDrawing();
 }
 

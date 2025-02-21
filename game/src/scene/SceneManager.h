@@ -12,6 +12,7 @@ class SceneManager
 		static void DrawScene();
 		static void TransitionToScreen(GameScreen screen);
 		static void Cleanup();
+		static GameScreen GetCurrentSceneType();
 
 		static bool s_showFPS;
 	

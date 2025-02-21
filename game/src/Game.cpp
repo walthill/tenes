@@ -28,6 +28,7 @@ void Game::Render()
 {
     RenderMatchPhase();
     gameGrid.Render();
+	RenderUI();
 }
 
 void Game::SetNextPhase(MatchPhase* a_phase)
@@ -98,4 +99,11 @@ void Game::RenderMatchPhase()
         default:
             break;
     }
+}
+
+void Game::RenderUI() {
+    if(SceneManager::GetCurrentSceneType() != GAMEPLAY)
+		return;
+    	
+    m_matchUI.Render();
 }
