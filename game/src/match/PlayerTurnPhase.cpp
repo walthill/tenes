@@ -85,7 +85,7 @@ void PlayerTurnPhase::Update()
 
 				if (GM->gameGrid.PlayerHasSecondPiece()) 
 				{
-					if (IsKeyPressed(KEY_D))
+					if (IsKeyPressed(KEY_C))
 					{
 						auto amountStr = "Player Move Piece 2-- Forward: " + std::to_string(m_rollAmount);
 						TraceLog(LOG_TRACE, amountStr.c_str());
@@ -97,7 +97,7 @@ void PlayerTurnPhase::Update()
 							m_timer = 0.0f;
 						}
 					}
-					else if (IsKeyPressed(KEY_A))
+					else if (IsKeyPressed(KEY_Z))
 					{
 						auto amountStr = "Player Move Piece 2 -- Back: " + std::to_string(m_rollAmount);
 						TraceLog(LOG_TRACE, amountStr.c_str());
@@ -170,10 +170,14 @@ void PlayerTurnPhase::ApplyBonusPoints()
 		return;
 
 	TraceLog(LOG_TRACE, "Player Points Bonus");
-	GM->IncrementBonusPointsCount(true);
-	if (GM->HasEarnedBonusPoints(true))
+	GM->IncrementBonusPointsCount();
+	if (GM->HasEarnedBonusPoints())
 	{
 		TraceLog(LOG_TRACE, "Apply Player Points Bonus");
 		GM->ApplyBonusPoints(true);
+	} 
+	else
+	{
+		GM->gameGrid.ReturnToRowStart(2, true, m_movingFirstPiece);
 	}
 }

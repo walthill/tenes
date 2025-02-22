@@ -269,6 +269,23 @@ void Grid::BonusPointsAwarded(bool a_isPlayer)
 	m_bonusPointTileAwarded = true;
 }
 
+void Grid::ReturnToRowStart(int a_rowIndex, bool a_isPlayer, bool a_firstPiece)
+{
+	Piece* piece = nullptr;
+	if(a_isPlayer)
+		piece = GetPlayerPiece(a_firstPiece);
+	else
+		piece = GetEnemyPiece(a_firstPiece);
+
+	piece->SetBoardIndex(m_width * a_rowIndex);
+	Vector2 newPos = m_gridList[m_width * a_rowIndex].pos;
+	newPos.x += m_tileSize * 0.5f;
+	newPos.y += m_tileSize * 0.5f;
+	newPos.x -= Piece::PieceSize * 0.5f;
+	newPos.y -= Piece::PieceSize * 0.5f;
+	piece->SetPosition(newPos);
+}
+
 void Grid::CheckPieceSwapEnemy(int a_destinationIndex)
 {
 	for (size_t i = 0; i < 2; i++)

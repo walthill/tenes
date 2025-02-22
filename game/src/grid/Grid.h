@@ -65,7 +65,7 @@ public:
 	int GetBonusPointsTileTargetHitCount() { return m_bonusPointsTileTargetHitCount; }
 	void BonusPointsAwarded(bool a_isPlayer);
 	bool AlreadyAwardedBonusPoints() { return m_bonusPointTileAwarded; }
-
+	void ReturnToRowStart(int a_rowIndex, bool a_isPlayer, bool a_firstPiece);
 
 private:
 	bool m_renderDebug = false;

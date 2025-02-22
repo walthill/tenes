@@ -35,9 +35,9 @@ public:
 	void ApplyPieceScored(bool a_isPlayer);
 	void ApplyBonusMove(bool a_isPlayer);
 	void ApplyBonusPoints(bool a_isPlayer);
-	void IncrementBonusPointsCount(bool a_isPlayer) { a_isPlayer ? m_playerScoreBonusHitCount++ : m_enemyScoreBonusHitCount++; }
-	bool HasEarnedBonusPoints(bool a_isPlayer) { return a_isPlayer ? m_playerScoreBonusHitCount == gameGrid.GetBonusPointsTileTargetHitCount() : m_enemyScoreBonusHitCount == gameGrid.GetBonusPointsTileTargetHitCount(); }
-	int GetBonusPointsCount(bool a_isPlayer) { return a_isPlayer ? m_playerScoreBonusHitCount : m_enemyScoreBonusHitCount; }
+	void IncrementBonusPointsCount() { m_scoreBonusHitCount++; }
+	bool HasEarnedBonusPoints() { return m_scoreBonusHitCount == gameGrid.GetBonusPointsTileTargetHitCount(); }
+	int GetBonusPointsCount() { return m_scoreBonusHitCount; }
 	bool HasEnemyFinished();
 	bool HasPlayerFinished();
 
@@ -63,15 +63,15 @@ private:
 	MatchPhase* mp_nextPhase = nullptr;
 	PhaseSubSection m_currentSubPhase;
 
+	int m_scoreBonusHitCount = 0;
+
 	bool m_playerNextRollBonus = false;
 	bool m_firstPlayerPieceScored = false;
-	int m_playerScoreBonusHitCount = 0;
 	bool m_playerMovingFirstPiece = true;
 	int m_playerScore = 0;
 
 	bool m_enemyNextRollBonus = false;
 	bool m_firstEnemyPieceScored = false;
-	int m_enemyScoreBonusHitCount = 0;
 	bool m_enemyMovingFirstPiece = true;
 	int m_enemyScore = 0;
 

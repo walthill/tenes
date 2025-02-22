@@ -143,10 +143,14 @@ void EnemyTurnPhase::ApplyBonusPoints()
 
 	TraceLog(LOG_TRACE, "Enemy Points Bonus");
 
-	GM->IncrementBonusPointsCount(false);
-	if (GM->HasEarnedBonusPoints(false))
+	GM->IncrementBonusPointsCount();
+	if (GM->HasEarnedBonusPoints())
 	{
 		TraceLog(LOG_TRACE, "Apply Enemy Points Bonus");
 		GM->ApplyBonusPoints(false);
+	}
+	else
+	{
+		GM->gameGrid.ReturnToRowStart(2, true, m_movingFirstPiece);
 	}
 }
