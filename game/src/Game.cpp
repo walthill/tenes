@@ -184,7 +184,10 @@ void Game::ApplyBonusPoints(bool a_isPlayer)
 
 bool Game::HasEnemyFinished()
 {
-	auto enemyPieces = gameGrid.GetEnemyPieces();
+    auto enemyPieces = gameGrid.GetEnemyPieces();
+    if (!gameGrid.EnemyHasSecondPiece())
+        return enemyPieces[0].HasScored();
+
     for (size_t i = 0; i < c_numPieces; i++)
     {
         if (!enemyPieces[i].HasScored())
@@ -196,6 +199,9 @@ bool Game::HasEnemyFinished()
 bool Game::HasPlayerFinished()
 {
     auto playerPieces = gameGrid.GetPlayerPieces();
+    if (!gameGrid.EnemyHasSecondPiece())
+        return playerPieces[0].HasScored();
+
     for (size_t i = 0; i < c_numPieces; i++)
     {
         if (!playerPieces[i].HasScored())

@@ -251,7 +251,7 @@ bool Grid::MoveEnemy(bool a_forward, int a_moveDistance, bool a_firstPiece)
 	return false;
 }
 
-//TODO: support cases where the first piece is returned to the start while the second piece is still on the board
+//TODO: support cases where the first piece is returned to the start while the second piece is still on the board (add visual diff between first and second piece?)
 void Grid::AddPlayerPiece()
 {
 	m_playerPieces[1].SetVisible(true);
