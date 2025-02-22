@@ -27,15 +27,18 @@ Grid::Grid(float a_PosX, float a_PosY, int a_numRows, int a_numCols, int a_tileS
 		}
 	}
 
-	m_playerPiece = Piece(5, true, 0);
-	
-	//TODO: make pieces objects that are rendered to the screen
-	//m_playerPiece.SetPosition
-
-	m_enemyPiece = Piece(5, false, 1);
+	m_playerPieces[0] = Piece(true, -1);
+	m_playerPieces[0].SetPosition({ 25.0f, 180.0f });
+	m_playerPieces[1] = Piece(true, -1);
+	m_playerPieces[1].SetPosition({ 25.0f, 180.0f + Piece::PieceSize + 16 });
+	m_playerPieces[1].SetVisible(false);
+	m_enemyPieces[0] = Piece(false, -1);
+	m_enemyPieces[0].SetPosition({(float)GetScreenWidth() - 100.0f, 180.0f});
+	m_enemyPieces[1] = Piece(false, -1);
+	m_enemyPieces[1].SetPosition({ (float)GetScreenWidth() - 100.0f, 180.0f + Piece::PieceSize + 16 });
+	m_enemyPieces[1].SetVisible(false);
 
 	InitBonusTiles();
-
 }
 
 void Grid::InitBonusTiles() {
@@ -49,7 +52,7 @@ void Grid::InitBonusTiles() {
 	randomIndex = dis(gen) + m_width;
 	m_gridList[randomIndex].type = TileType::PIECE_BONUS;
 
-	m_gridList[m_gridList.size() - 1].type = TileType::POINTS_BONUS;
+	m_gridList[m_gridList.size() - 2].type = TileType::POINTS_BONUS;
 }
 
 void Grid::Update()
@@ -63,6 +66,7 @@ void Grid::Update()
 void Grid::Render()
 {
 	RenderTiles();
+	RenderPieces();
 #if _DEBUG
 	if (m_renderDebug)
 	{
@@ -94,6 +98,18 @@ void Grid::RenderTiles()
 		}
 
 		DrawRectangle((int)tile.pos.x, (int)tile.pos.y, m_tileSize, m_tileSize, tileColor);
+	}
+}
+
+void Grid::RenderPieces() {
+	for each(auto piece in m_playerPieces)
+	{
+		piece.Render();
+	}
+
+	for each(auto piece in m_enemyPieces)
+	{
+		piece.Render();
 	}
 }
 
@@ -141,22 +157,29 @@ Tile* Grid::GetTileFromIndex(int a_index)
 	return &m_gridList[a_index];
 }
 
-bool Grid::MovePlayer(bool a_forward, int a_moveDistance)
+bool Grid::MovePlayer(bool a_forward, int a_moveDistance, bool a_firstPiece)
 {
 	if (a_moveDistance == 0)
 		return false;
 
-	auto initialIndex = m_playerPiece.GetBoardIndex();
+	auto playerPiece = GetPlayerPiece(a_firstPiece);
+	auto initialIndex = playerPiece->GetBoardIndex();
 	if (a_forward)
 	{
 		auto moveIndex = initialIndex + a_moveDistance;
 		if (moveIndex < m_gridList.size())
 		{
-			CheckPieceSwapEnemy(initialIndex, moveIndex);
+			CheckPieceSwapEnemy(moveIndex);
+			CheckForPlayerPieceScore(moveIndex, a_firstPiece);
 
-			//TODO: update piece movement
-			//m_gridList[moveIndex].type = TileType::PLAYER;
-			m_playerPiece.SetBoardIndex(moveIndex);
+			playerPiece->SetBoardIndex(moveIndex);
+			Vector2 newPos = m_gridList[moveIndex].pos;
+			newPos.x += m_tileSize * 0.5f;
+			newPos.y += m_tileSize * 0.5f;
+			newPos.x -= Piece::PieceSize * 0.5f;
+			newPos.y -= Piece::PieceSize * 0.5f; 
+			playerPiece->SetPosition(newPos);
+			return true;
 		}
 	}
 	else
@@ -164,33 +187,46 @@ bool Grid::MovePlayer(bool a_forward, int a_moveDistance)
 		auto moveIndex = initialIndex - a_moveDistance;
 		if (moveIndex >= 0)
 		{
-			CheckPieceSwapEnemy(initialIndex, moveIndex);
+			CheckPieceSwapEnemy(moveIndex);
+			CheckForPlayerPieceScore(moveIndex, a_firstPiece);
 
-			//TODO: update piece movement
-			//m_gridList[moveIndex].type = TileType::PLAYER;
-			m_playerPiece.SetBoardIndex(moveIndex);
+			playerPiece->SetBoardIndex(moveIndex);
+			Vector2 newPos = m_gridList[moveIndex].pos;
+			newPos.x += m_tileSize * 0.5f;
+			newPos.y += m_tileSize * 0.5f;
+			newPos.x -= Piece::PieceSize * 0.5f;
+			newPos.y -= Piece::PieceSize * 0.5f;
+			playerPiece->SetPosition(newPos);
+			return true;
 		}
 	}
 
-	return true;
+	return false;
 }
 
-bool Grid::MoveEnemy(bool a_forward, int a_moveDistance)
+bool Grid::MoveEnemy(bool a_forward, int a_moveDistance, bool a_firstPiece)
 {
 	if (a_moveDistance == 0)
 		return false;
 
-	auto initialIndex = m_enemyPiece.GetBoardIndex();
+	auto enemyPiece = GetEnemyPiece(a_firstPiece);
+	auto initialIndex = enemyPiece->GetBoardIndex();
 	if (a_forward)
 	{
 		auto moveIndex = initialIndex + a_moveDistance;
 		if (moveIndex < m_gridList.size())
 		{
-			CheckPieceSwapPlayer(initialIndex, moveIndex);
+			CheckPieceSwapPlayer(moveIndex);
+			CheckForEnemyPieceScore(moveIndex, a_firstPiece);
 
-			//TODO: update piece movement
-			//m_gridList[moveIndex].type = TileType::ENEMY;
-			m_enemyPiece.SetBoardIndex(moveIndex);
+			enemyPiece->SetBoardIndex(moveIndex);
+			Vector2 newPos = m_gridList[moveIndex].pos;
+			newPos.x += m_tileSize * 0.5f;
+			newPos.y += m_tileSize * 0.5f;
+			newPos.x -= Piece::PieceSize * 0.5f;
+			newPos.y -= Piece::PieceSize * 0.5f;
+			enemyPiece->SetPosition(newPos);
+			return true;
 		}
 	}
 	else
@@ -198,62 +234,86 @@ bool Grid::MoveEnemy(bool a_forward, int a_moveDistance)
 		auto moveIndex = initialIndex - a_moveDistance;
 		if (moveIndex >= 0)
 		{
-			CheckPieceSwapPlayer(initialIndex, moveIndex);
+			CheckPieceSwapPlayer(moveIndex);
+			CheckForEnemyPieceScore(moveIndex, a_firstPiece);
 
-			//TODO: update piece movement
-			//m_gridList[moveIndex].type = TileType::ENEMY;
-			m_enemyPiece.SetBoardIndex(moveIndex);
+			enemyPiece->SetBoardIndex(moveIndex);
+			Vector2 newPos = m_gridList[moveIndex].pos;
+			newPos.x += m_tileSize * 0.5f;
+			newPos.y += m_tileSize * 0.5f;
+			newPos.x -= Piece::PieceSize * 0.5f;
+			newPos.y -= Piece::PieceSize * 0.5f;
+			enemyPiece->SetPosition(newPos);
+			return true;
 		}
 	}
 
-	return true;
+	return false;
 }
 
-bool Grid::HasEnemyWon()
+//TODO: support cases where the first piece is returned to the start while the second piece is still on the board
+void Grid::AddPlayerPiece()
 {
-	return m_enemyPiece.GetBoardIndex() == m_gridList.size() - 1;
+	m_playerPieces[1].SetVisible(true);
+	GM->AddPiece(true);
 }
 
-bool Grid::HasPlayerWon()
+void Grid::AddEnemyPiece()
 {
-	return m_playerPiece.GetBoardIndex() == m_gridList.size() - 1;
+	m_enemyPieces[1].SetVisible(true);
+	GM->AddPiece(false);
 }
 
-void Grid::BonusPointsAwarded()
+void Grid::BonusPointsAwarded(bool a_isPlayer)
 {
 	m_bonusPointTileAwarded = true;
 }
 
-void Grid::CheckPieceSwapEnemy(int a_initialIndex, int a_destinationIndex)
+void Grid::CheckPieceSwapEnemy(int a_destinationIndex)
 {
-	//TODO: update piece movement
-	if (m_gridList[a_destinationIndex].type == TileType::NIL)
+	for (size_t i = 0; i < 2; i++)
 	{
-		//move enemy to player's start position
-		m_enemyPiece.SetBoardIndex(a_initialIndex);
-		//TODO: update piece movement
-		//m_gridList[a_initialIndex].type = TileType::ENEMY;
-	}
-	else
-	{
-		//TODO: update piece movement
-		m_gridList[a_initialIndex].type = TileType::BASE;
+		auto& enemyPiece = m_enemyPieces[i];
+		if (enemyPiece.GetBoardIndex() == a_destinationIndex)
+		{
+			enemyPiece.SetBoardIndex(-1);
+			enemyPiece.SetPosition({ (float)GetScreenWidth() - 100.0f, 180.0f + ((Piece::PieceSize + 16) * i) });
+		}
 	}
 }
 
-
-void Grid::CheckPieceSwapPlayer(int a_initialIndex, int a_destinationIndex)
+void Grid::CheckPieceSwapPlayer(int a_destinationIndex)
 {
-	//TODO: update piece movement
-	if (m_gridList[a_destinationIndex].type == TileType::NIL)
+	for (size_t i = 0; i < 2; i++)
 	{
-		//move player to enemy's start position
-		m_playerPiece.SetBoardIndex(a_initialIndex);
-		
-		//m_gridList[a_initialIndex].type = TileType::PLAYER;
+		auto& playerPiece = m_playerPieces[i];
+		if (playerPiece.GetBoardIndex() == a_destinationIndex)
+		{
+			playerPiece.SetBoardIndex(-1);
+			playerPiece.SetPosition({ 25.0f, 180.0f + ((Piece::PieceSize + 16) * i) });
+		}
 	}
-	else
-	{
-		m_gridList[a_initialIndex].type = TileType::BASE;
-	}
+}
+
+void Grid::CheckForPlayerPieceScore(int a_destinationIndex, bool a_firstPiece)
+{
+	if (a_destinationIndex != m_gridList.size() - 1)
+		return;
+
+	GM->ApplyPieceScored(true);
+	auto playerPiece = GetEnemyPiece(a_firstPiece);
+	playerPiece->SetBoardIndex(-1);
+	playerPiece->SetVisible(false);
+}
+
+void Grid::CheckForEnemyPieceScore(int a_destinationIndex, bool a_firstPiece)
+{
+	if(a_destinationIndex != m_gridList.size() - 1)
+		return;
+
+	GM->ApplyPieceScored(false);
+	auto enemyPiece = GetEnemyPiece(a_firstPiece);
+	enemyPiece->SetBoardIndex(-1);
+	enemyPiece->SetVisible(false);
+
 }

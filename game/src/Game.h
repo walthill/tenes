@@ -15,6 +15,9 @@ class Game
 public:
 	static Game* gameInstance;
 	static void LoadGame(int a_windowX, int windowY, int tileSize, Grid a_grid);
+	static void UnloadGame();
+
+	~Game();
 
 	void Update();
 	void Render();
@@ -24,19 +27,53 @@ public:
 
 	void LoadScene(GameScreen a_screen);
 
+	//UI Functions
+	void IncrementTurnCount() { matchUI.IncrementTurnCount(); }
+	void AddPiece(bool a_isPlayer);
+
+	int DoDiceRoll(bool a_isPlayer);
+	void ApplyPieceScored(bool a_isPlayer);
+	void ApplyBonusMove(bool a_isPlayer);
+	void ApplyBonusPoints(bool a_isPlayer);
+	void IncrementBonusPointsCount(bool a_isPlayer) { a_isPlayer ? m_playerScoreBonusHitCount++ : m_enemyScoreBonusHitCount++; }
+	bool HasEarnedBonusPoints(bool a_isPlayer) { return a_isPlayer ? m_playerScoreBonusHitCount == gameGrid.GetBonusPointsTileTargetHitCount() : m_enemyScoreBonusHitCount == gameGrid.GetBonusPointsTileTargetHitCount(); }
+	int GetBonusPointsCount(bool a_isPlayer) { return a_isPlayer ? m_playerScoreBonusHitCount : m_enemyScoreBonusHitCount; }
+	bool HasEnemyFinished();
+	bool HasPlayerFinished();
+
 	//Game Defines
 	int windowX;
 	int windowY;
 	int tileSize;
 	Grid gameGrid;
+	MatchUI matchUI;
 
 private:
+	const int c_defaultMinRollAmount = 0;
+	const int c_defaultMaxRollAmount = 2;
+	const int c_numPieces = 2;
+	const int c_bonusRollAmount = 2;
+	const int c_bonusPointsAmount = 1000;
+	const int c_firstPieceScoreAmount = 1000;
+	const int c_addPieceScoreBonus = (int)(c_firstPieceScoreAmount * 0.25f);
+	const int c_secondPieceScoreAmount = (int)(c_firstPieceScoreAmount * 0.5f);
 
 	bool m_changePhase;
-	MatchPhase* mp_currentPhase;
-	MatchPhase* mp_nextPhase;
+	MatchPhase* mp_currentPhase = nullptr;
+	MatchPhase* mp_nextPhase = nullptr;
 	PhaseSubSection m_currentSubPhase;
-	MatchUI m_matchUI;
+
+	bool m_playerNextRollBonus = false;
+	bool m_firstPlayerPieceScored = false;
+	int m_playerScoreBonusHitCount = 0;
+	bool m_playerMovingFirstPiece = true;
+	int m_playerScore = 0;
+
+	bool m_enemyNextRollBonus = false;
+	bool m_firstEnemyPieceScored = false;
+	int m_enemyScoreBonusHitCount = 0;
+	bool m_enemyMovingFirstPiece = true;
+	int m_enemyScore = 0;
 
 	void UpdateMatchPhase();
 	void RenderMatchPhase();

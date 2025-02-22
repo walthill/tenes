@@ -26,10 +26,7 @@ class PlayerTurnPhase : public MatchPhase
         int m_rollAmount;
         bool m_turnEnd;
         float m_timeToEndTurn;
-        int m_minRollAmount = c_defaultMinRollAmount;
-        int m_maxRollAmount = c_defaultMaxRollAmount;
-        bool m_nextRollBonus = false;
-        int m_scoreBonusHitCount = 0;
+        bool m_movingFirstPiece = true;
 
         void CheckForBonusTile();
         void ApplyBonusMove();

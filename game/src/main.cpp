@@ -10,15 +10,20 @@ For a C++ project simply rename the file to .cpp and run premake
 #include "raylib.h"
 #include "Game.h"
 
-const int windowX = 960;
-const int windowY = 600;
-const int tileSize = 64;
+const int windowX = 1000;
+const int windowY = (int)(windowX / 1.5f);
+const int tileSize = 64*2;
 
 void InitGame()
 {
 	//set up game grid
-	auto gameGrid = Grid(300, 150, 5, 3, tileSize);
+	auto gameGrid = Grid(125, 150, 5, 3, tileSize);
 	Game::LoadGame(windowX, windowY, tileSize, gameGrid);
+}
+
+void CleanupGame()
+{
+	Game::UnloadGame();
 }
 
 void Update()
@@ -43,7 +48,7 @@ void InitRaylib()
 	SetTraceLogLevel(LOG_INFO);
 #endif
 	SetTargetFPS(60);
-	InitWindow(windowX, windowY, "Tenes");
+	InitWindow(windowX, windowY, "Triple Creek");
 	InitAudioDevice();
 }
 
@@ -73,6 +78,7 @@ int main()
 		Render();
 	}
 
+	CleanupGame();
 	SceneManager::Cleanup();
 	CleanRaylib();
 	return 0;

@@ -41,7 +41,6 @@ public:
 	void Update();
 	void Render();
 
-	void RenderTiles();
 	Vector2 Get2DCoordsFromPos(Vector2 a_pos);
 	int GetTileIndexFromPos(float a_x, float a_y);
 	int GetTileIndexFromPos(Vector2 a_pos);
@@ -50,16 +49,22 @@ public:
 	Tile* GetTileFromIndex(int a_index);
 	inline int GetWidth() { return m_width; };
 	inline int GetHeight() { return m_height; };
-	inline Piece* GetPlayerPiece() { return &m_playerPiece; }
-	inline Piece* GetEnemyPiece() { return &m_playerPiece; }
+	inline Piece* GetPlayerPiece(bool a_firstPiece) { return &m_playerPieces[a_firstPiece ? 0 : 1]; }
+	inline Piece* GetEnemyPiece(bool a_firstPiece) { return &m_enemyPieces[a_firstPiece ? 0 : 1]; }
+	inline bool PlayerHasSecondPiece() { return m_playerPieces[1].IsVisible(); };
+	inline bool EnemyHasSecondPiece() { return m_enemyPieces[1].IsVisible(); };
+	const Piece* GetPlayerPieces() { return m_playerPieces; }
+	const Piece* GetEnemyPieces() { return m_enemyPieces; }
 
-	bool MovePlayer(bool a_forward, int a_moveDistance);
-	bool MoveEnemy(bool a_forward, int a_moveDistance);
-	bool HasEnemyWon();
-	bool HasPlayerWon();
+	bool MovePlayer(bool a_forward, int a_moveDistance, bool a_firstPiece);
+	bool MoveEnemy(bool a_forward, int a_moveDistance, bool a_firstPiece);
+
+	void AddPlayerPiece();
+	void AddEnemyPiece();
 
 	int GetBonusPointsTileTargetHitCount() { return m_bonusPointsTileTargetHitCount; }
-	void BonusPointsAwarded();
+	void BonusPointsAwarded(bool a_isPlayer);
+	bool AlreadyAwardedBonusPoints() { return m_bonusPointTileAwarded; }
 
 
 private:
@@ -68,13 +73,19 @@ private:
 	int m_tileSize;
 	int m_width;
 	int m_height;
-	Piece m_playerPiece;
-	Piece m_enemyPiece;
+	
+	Piece m_playerPieces[2];
+	Piece m_enemyPieces[2];
+
 	bool m_bonusPointTileAwarded = false;
 	int m_bonusPointsTileTargetHitCount = 3;
 
-	void CheckPieceSwapPlayer(int a_initialIndex, int a_destinationIndex);
-	void CheckPieceSwapEnemy(int a_initialIndex, int a_destinationIndex);
+	void RenderTiles();
+	void RenderPieces();
+	void CheckPieceSwapPlayer(int a_destinationIndex);
+	void CheckPieceSwapEnemy(int a_destinationIndex);
+	void CheckForPlayerPieceScore(int a_destinationIndex, bool a_firstPiece);
+	void CheckForEnemyPieceScore(int a_destinationIndex, bool a_firstPiece);
 };
 
 #endif // !GRID_H
