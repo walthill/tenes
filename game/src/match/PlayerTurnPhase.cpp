@@ -160,6 +160,9 @@ void PlayerTurnPhase::ApplyBonusMove()
 
 void PlayerTurnPhase::ApplyBonusPiece()
 {
+	if (GM->gameGrid.PlayerHasSecondPiece())
+		return;
+
 	TraceLog(LOG_TRACE, "Player Piece Bonus");
 	GM->gameGrid.AddPlayerPiece();
 }

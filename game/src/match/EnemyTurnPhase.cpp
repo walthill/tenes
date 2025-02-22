@@ -132,6 +132,9 @@ void EnemyTurnPhase::ApplyBonusMove()
 
 void EnemyTurnPhase::ApplyBonusPiece()
 {
+	if (GM->gameGrid.EnemyHasSecondPiece())
+		return;
+
 	TraceLog(LOG_TRACE, "Enemy Piece Bonus");
 	GM->gameGrid.AddEnemyPiece();
 }
