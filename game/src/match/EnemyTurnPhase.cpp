@@ -5,8 +5,8 @@
 
 EnemyTurnPhase::EnemyTurnPhase()
 {
-	m_timeUntilRoll = 1.33f;
-	m_waitAfterRollTime = 1.33f;
+	m_timeUntilRoll = 0.5f;
+	m_waitAfterRollTime = 0.5f;
 	m_timer = 0;
 	m_rollComplete = false;
 	m_rollAmount = 0;
@@ -67,27 +67,43 @@ void EnemyTurnPhase::Update()
 			m_timer += GetFrameTime();
 		else
 		{
-			m_timer = 0;
+			//TODO: how should the AI decide which direction and which piece to move? 
+			//for now just move forward on a random piece
+			
 			if (m_rollAmount > 0)
 			{
-				//TODO: how should the AI decide which direction and which piece to move? 
-				//for now just move forward on a random piece
-
-				if (GM->gameGrid.EnemyHasSecondPiece() && GetRandomValue(0, 1) == 0)
+				if (!m_pieceMoving)
 				{
-					m_movingFirstPiece = false;
+					// Decide which piece to move
+					if (GM->gameGrid.EnemyHasSecondPiece() && GetRandomValue(0, 1) == 0)
+					{
+						m_movingFirstPiece = false;
+					}
+					else
+					{
+						m_movingFirstPiece = true;
+					}
+
+					auto amountStr = "Enemy Move -- Forward: " + std::to_string(m_rollAmount);
+					TraceLog(LOG_TRACE, amountStr.c_str());
+					m_pieceMoving = true;
 				}
 				else
 				{
-					m_movingFirstPiece = true;
+					if (GM->gameGrid.MoveEnemy(true, m_rollAmount, m_movingFirstPiece))
+					{
+						CheckForBonusTile();
+						m_turnEnd = true;
+						m_timer = 0.0f;
+						m_pieceMoving = false;
+					}
 				}
-				
-				auto amountStr = "Enemy Move -- Forward: " + std::to_string(m_rollAmount);
-				TraceLog(LOG_TRACE, amountStr.c_str());
-				GM->gameGrid.MoveEnemy(true, m_rollAmount, m_movingFirstPiece);
-				CheckForBonusTile();
 			}
-			m_turnEnd = true;
+			else
+			{
+				m_turnEnd = true;
+				m_timer = 0.0f;
+			}
 		}
 	}
 }

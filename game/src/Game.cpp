@@ -138,6 +138,7 @@ int Game::DoDiceRoll(bool a_isPlayer)
 	return rollAmount;
 }
 
+//TODO: add turn speed bonus (track the turn a piece is made visible?)
 void Game::ApplyPieceScored(bool a_isPlayer)
 {
     if (a_isPlayer) {

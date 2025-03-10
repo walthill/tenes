@@ -27,15 +27,20 @@ Grid::Grid(float a_PosX, float a_PosY, int a_numRows, int a_numCols, int a_tileS
 		}
 	}
 
+	m_playerStartPos1 = { 25.0f, 180.0f };
+	m_playerStartPos2 = { 25.0f, 180.0f + Piece::PieceSize + 16 };
+	m_enemyStartPos1 = { (float)GetScreenWidth() - 100.0f, 180.0f };
+	m_enemyStartPos2 = { (float)GetScreenWidth() - 100.0f, 180.0f + Piece::PieceSize + 16 };
+
 	m_playerPieces[0] = Piece(true, -1);
-	m_playerPieces[0].SetPosition({ 25.0f, 180.0f });
+	m_playerPieces[0].SetPosition(m_playerStartPos1);
 	m_playerPieces[1] = Piece(true, -1);
-	m_playerPieces[1].SetPosition({ 25.0f, 180.0f + Piece::PieceSize + 16 });
+	m_playerPieces[1].SetPosition(m_playerStartPos2);
 	m_playerPieces[1].SetVisible(false);
 	m_enemyPieces[0] = Piece(false, -1);
-	m_enemyPieces[0].SetPosition({(float)GetScreenWidth() - 100.0f, 180.0f});
+	m_enemyPieces[0].SetPosition(m_enemyStartPos1);
 	m_enemyPieces[1] = Piece(false, -1);
-	m_enemyPieces[1].SetPosition({ (float)GetScreenWidth() - 100.0f, 180.0f + Piece::PieceSize + 16 });
+	m_enemyPieces[1].SetPosition(m_enemyStartPos2);
 	m_enemyPieces[1].SetVisible(false);
 
 	InitBonusTiles();
@@ -157,48 +162,43 @@ Tile* Grid::GetTileFromIndex(int a_index)
 	return &m_gridList[a_index];
 }
 
+//TODO: lerp/animate the movement
 bool Grid::MovePlayer(bool a_forward, int a_moveDistance, bool a_firstPiece)
 {
-	if (a_moveDistance == 0)
-		return false;
-
 	auto playerPiece = GetPlayerPiece(a_firstPiece);
-	auto initialIndex = playerPiece->GetBoardIndex();
-	if (a_forward)
-	{
-		auto moveIndex = initialIndex + a_moveDistance;
-		if (moveIndex < m_gridList.size())
-		{
-			CheckPieceSwapEnemy(moveIndex);
-			CheckForPlayerPieceScore(moveIndex, a_firstPiece);
+	if (!playerPiece->IsMoving()) {
+		if (a_moveDistance == 0)
+			return false;
 
-			playerPiece->SetBoardIndex(moveIndex);
-			Vector2 newPos = m_gridList[moveIndex].pos;
-			newPos.x += m_tileSize * 0.5f;
-			newPos.y += m_tileSize * 0.5f;
-			newPos.x -= Piece::PieceSize * 0.5f;
-			newPos.y -= Piece::PieceSize * 0.5f; 
-			playerPiece->SetPosition(newPos);
-			return true;
+		auto initialIndex = playerPiece->GetBoardIndex();
+		m_moveIndex = a_forward ? initialIndex + a_moveDistance : initialIndex - a_moveDistance;
+
+		if (m_moveIndex < 0 || m_moveIndex >= m_gridList.size())
+			return false;
+
+		std::vector<Vector2> path;
+		int step = a_forward ? 1 : -1;
+		for (int i = initialIndex + step; i != m_moveIndex + step; i += step)
+		{
+			auto pos = m_gridList[i].pos;
+			pos.x += m_tileSize * 0.5f;
+			pos.y += m_tileSize * 0.5f;
+			pos.x -= Piece::PieceSize * 0.5f;
+			pos.y -= Piece::PieceSize * 0.5f;
+			path.push_back(pos);
 		}
+
+		playerPiece->StartMovement(m_moveIndex, path);
 	}
 	else
 	{
-		auto moveIndex = initialIndex - a_moveDistance;
-		if (moveIndex >= 0)
-		{
-			CheckPieceSwapEnemy(moveIndex);
-			CheckForPlayerPieceScore(moveIndex, a_firstPiece);
+		auto moveDone = playerPiece->Move();
+		if (moveDone) {
+			CheckPieceSwapEnemy(m_moveIndex);
+			CheckForPlayerPieceScore(m_moveIndex, a_firstPiece);
 
-			playerPiece->SetBoardIndex(moveIndex);
-			Vector2 newPos = m_gridList[moveIndex].pos;
-			newPos.x += m_tileSize * 0.5f;
-			newPos.y += m_tileSize * 0.5f;
-			newPos.x -= Piece::PieceSize * 0.5f;
-			newPos.y -= Piece::PieceSize * 0.5f;
-			playerPiece->SetPosition(newPos);
-			return true;
 		}
+		return moveDone;
 	}
 
 	return false;
@@ -206,46 +206,37 @@ bool Grid::MovePlayer(bool a_forward, int a_moveDistance, bool a_firstPiece)
 
 bool Grid::MoveEnemy(bool a_forward, int a_moveDistance, bool a_firstPiece)
 {
-	if (a_moveDistance == 0)
-		return false;
-
 	auto enemyPiece = GetEnemyPiece(a_firstPiece);
-	auto initialIndex = enemyPiece->GetBoardIndex();
-	if (a_forward)
-	{
-		auto moveIndex = initialIndex + a_moveDistance;
-		if (moveIndex < m_gridList.size())
-		{
-			CheckPieceSwapPlayer(moveIndex);
-			CheckForEnemyPieceScore(moveIndex, a_firstPiece);
+	if (!enemyPiece->IsMoving()) {
+		if (a_moveDistance == 0)
+			return false;
 
-			enemyPiece->SetBoardIndex(moveIndex);
-			Vector2 newPos = m_gridList[moveIndex].pos;
-			newPos.x += m_tileSize * 0.5f;
-			newPos.y += m_tileSize * 0.5f;
-			newPos.x -= Piece::PieceSize * 0.5f;
-			newPos.y -= Piece::PieceSize * 0.5f;
-			enemyPiece->SetPosition(newPos);
-			return true;
+		auto initialIndex = enemyPiece->GetBoardIndex();
+		m_moveIndex = a_forward ? initialIndex + a_moveDistance : initialIndex - a_moveDistance;
+
+		if (m_moveIndex < 0 || m_moveIndex >= m_gridList.size())
+			return false;
+		std::vector<Vector2> path;
+		int step = a_forward ? 1 : -1;
+		for (int i = initialIndex + step; i != m_moveIndex + step; i += step)
+		{
+			auto pos = m_gridList[i].pos;
+			pos.x += m_tileSize * 0.5f;
+			pos.y += m_tileSize * 0.5f;
+			pos.x -= Piece::PieceSize * 0.5f;
+			pos.y -= Piece::PieceSize * 0.5f;
+			path.push_back(pos);
 		}
+		enemyPiece->StartMovement(m_moveIndex, path);
 	}
 	else
 	{
-		auto moveIndex = initialIndex - a_moveDistance;
-		if (moveIndex >= 0)
-		{
-			CheckPieceSwapPlayer(moveIndex);
-			CheckForEnemyPieceScore(moveIndex, a_firstPiece);
-
-			enemyPiece->SetBoardIndex(moveIndex);
-			Vector2 newPos = m_gridList[moveIndex].pos;
-			newPos.x += m_tileSize * 0.5f;
-			newPos.y += m_tileSize * 0.5f;
-			newPos.x -= Piece::PieceSize * 0.5f;
-			newPos.y -= Piece::PieceSize * 0.5f;
-			enemyPiece->SetPosition(newPos);
-			return true;
+		auto moveDone = enemyPiece->Move();
+		if (moveDone) {
+			CheckPieceSwapPlayer(m_moveIndex);
+			CheckForEnemyPieceScore(m_moveIndex, a_firstPiece);
 		}
+		return moveDone;
 	}
 
 	return false;
@@ -284,6 +275,14 @@ void Grid::ReturnToRowStart(int a_rowIndex, bool a_isPlayer, bool a_firstPiece)
 	newPos.x -= Piece::PieceSize * 0.5f;
 	newPos.y -= Piece::PieceSize * 0.5f;
 	piece->SetPosition(newPos);
+}
+
+bool Grid::CanMovePlayerPiece(int a_rollAmount, bool a_forward, bool a_firstPiece)
+{
+	auto playerPiece = GetPlayerPiece(a_firstPiece);
+	auto index = playerPiece->GetBoardIndex();
+	return a_forward ? index + a_rollAmount <= m_gridList.size() - 1
+		: index - a_rollAmount >= 0;
 }
 
 void Grid::CheckPieceSwapEnemy(int a_destinationIndex)

@@ -67,13 +67,20 @@ public:
 	bool AlreadyAwardedBonusPoints() { return m_bonusPointTileAwarded; }
 	void ReturnToRowStart(int a_rowIndex, bool a_isPlayer, bool a_firstPiece);
 
+	bool CanMovePlayerPiece(int a_rollAmount, bool a_forward, bool a_firstPiece);
+
 private:
 	bool m_renderDebug = false;
 	std::vector<Tile> m_gridList;
 	int m_tileSize;
 	int m_width;
 	int m_height;
-	
+	int m_moveIndex;
+	Vector2 m_playerStartPos1;
+	Vector2 m_playerStartPos2;
+	Vector2 m_enemyStartPos1;
+	Vector2 m_enemyStartPos2;
+
 	Piece m_playerPieces[2];
 	Piece m_enemyPieces[2];
 

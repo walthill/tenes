@@ -4,8 +4,8 @@
 
 PlayerTurnPhase::PlayerTurnPhase()
 {
-	m_waitAfterRollTime = 1.33f;
-	m_timeToEndTurn = 1.33f;
+	m_waitAfterRollTime = 0.0f;
+	m_timeToEndTurn = 1.0f;
 	m_rollComplete = false;
 	m_rollAmount = 0;
 	m_timer = 0;
@@ -57,57 +57,52 @@ void PlayerTurnPhase::Update()
 		{
 			if (m_rollAmount > 0)
 			{
-				if (IsKeyPressed(KEY_E))
+				if (!m_pieceMoving)
 				{
-					auto moveForward = false;
-					auto amountStr = "Player Move -- Forward: " + std::to_string(m_rollAmount);
-					TraceLog(LOG_TRACE, amountStr.c_str());
-					m_movingFirstPiece = true;
-					if (GM->gameGrid.MovePlayer(true, m_rollAmount, m_movingFirstPiece))
+					if (IsKeyPressed(KEY_E) && GM->gameGrid.CanMovePlayerPiece(m_rollAmount, true, true))
+					{
+						auto amountStr = "Player Move -- Forward: " + std::to_string(m_rollAmount);
+						TraceLog(LOG_TRACE, amountStr.c_str());
+						m_movingFirstPiece = true;
+						m_pieceMoving = true;
+						m_moveForward = true;
+					}
+					else if (IsKeyPressed(KEY_Q) && GM->gameGrid.CanMovePlayerPiece(m_rollAmount, false, true))
+					{
+						auto amountStr = "Player Move -- Back: " + std::to_string(m_rollAmount);
+						TraceLog(LOG_TRACE, amountStr.c_str());
+						m_movingFirstPiece = true;
+						m_pieceMoving = true;
+						m_moveForward = false;
+					}
+					else if (GM->gameGrid.PlayerHasSecondPiece())
+					{
+						if (IsKeyPressed(KEY_C) && GM->gameGrid.CanMovePlayerPiece(m_rollAmount, true, false))
+						{
+							auto amountStr = "Player Move Piece 2-- Forward: " + std::to_string(m_rollAmount);
+							TraceLog(LOG_TRACE, amountStr.c_str());
+							m_movingFirstPiece = false;
+							m_pieceMoving = true;
+							m_moveForward = true;
+						}
+						else if (IsKeyPressed(KEY_Z) && GM->gameGrid.CanMovePlayerPiece(m_rollAmount, false, false))
+						{
+							auto amountStr = "Player Move Piece 2 -- Back: " + std::to_string(m_rollAmount);
+							TraceLog(LOG_TRACE, amountStr.c_str());
+							m_movingFirstPiece = false;
+							m_pieceMoving = true;
+							m_moveForward = false;
+						}
+					}
+				}
+				else
+				{
+					if (GM->gameGrid.MovePlayer(m_moveForward, m_rollAmount, m_movingFirstPiece))
 					{
 						CheckForBonusTile();
 						m_turnEnd = true;
 						m_timer = 0.0f;
-					}
-				}
-				else if (IsKeyPressed(KEY_Q))
-				{
-					auto amountStr = "Player Move -- Back: " + std::to_string(m_rollAmount);
-					TraceLog(LOG_TRACE, amountStr.c_str());
-					m_movingFirstPiece = true;
-					if (GM->gameGrid.MovePlayer(false, m_rollAmount, m_movingFirstPiece))
-					{
-						CheckForBonusTile();
-						m_turnEnd = true;
-						m_timer = 0.0f;
-					}
-				}
-
-				if (GM->gameGrid.PlayerHasSecondPiece()) 
-				{
-					if (IsKeyPressed(KEY_C))
-					{
-						auto amountStr = "Player Move Piece 2-- Forward: " + std::to_string(m_rollAmount);
-						TraceLog(LOG_TRACE, amountStr.c_str());
-						m_movingFirstPiece = false;
-						if (GM->gameGrid.MovePlayer(true, m_rollAmount, m_movingFirstPiece))
-						{
-							CheckForBonusTile();
-							m_turnEnd = true;
-							m_timer = 0.0f;
-						}
-					}
-					else if (IsKeyPressed(KEY_Z))
-					{
-						auto amountStr = "Player Move Piece 2 -- Back: " + std::to_string(m_rollAmount);
-						TraceLog(LOG_TRACE, amountStr.c_str());
-						m_movingFirstPiece = false;
-						if (GM->gameGrid.MovePlayer(false, m_rollAmount, m_movingFirstPiece))
-						{
-							CheckForBonusTile();
-							m_turnEnd = true;
-							m_timer = 0.0f;
-						}
+						m_pieceMoving = false;
 					}
 				}
 			}

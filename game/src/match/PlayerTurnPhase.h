@@ -27,6 +27,8 @@ class PlayerTurnPhase : public MatchPhase
         bool m_turnEnd;
         float m_timeToEndTurn;
         bool m_movingFirstPiece = true;
+        bool m_pieceMoving = false;
+        bool m_moveForward = false;
 
         void CheckForBonusTile();
         void ApplyBonusMove();
